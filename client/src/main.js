@@ -4,6 +4,7 @@ import UIkit from 'uikit';
 import Icons from 'uikit/dist/js/uikit-icons';
 import 'uikit/dist/css/uikit.min.css';
 import Vue from 'vue';
+import Vuex from 'vuex';
 import App from './App';
 import router from './router';
 
@@ -11,6 +12,7 @@ import router from './router';
 UIkit.use(Icons);
 
 Vue.config.productionTip = false;
+Vue.use(Vuex);
 
 /* eslint-disable no-new */
 new Vue({

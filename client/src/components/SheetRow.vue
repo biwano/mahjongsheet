@@ -26,7 +26,10 @@
       <!-- Score -->
       <th><input class="uk-input" type="number" v-model.number="score"/></th>
       <!-- Player points -->
-      <td v-for="player in players" :key="player.id">{{ rowdata.points[player.id] }}</td>
+      <td v-for="player in players" :key="player.id"
+        :class="{ 'uk-alert-success': isWinner(player), 'uk-alert-danger': isPickedOn(player) }">
+        {{ rowdata.points[player.id] }}
+      </td>
     </tr>
   </tbody>
 
@@ -78,6 +81,12 @@ export default {
       this.$emit('update:data', rowdata);
       return rowdata;
     },
+    isWinner(player) {
+      return player.id === this.winnerId;
+    },
+    isPickedOn(player) {
+      return player.id === this.pickedOnId;
+    },
   },
   computed: {
     rowdata() {
@@ -93,3 +102,11 @@ export default {
   },
 };
 </script>
+<style scoped>
+.winner {
+  background-color: #efe;
+}
+.pickedOn {
+  background-color: #fee;
+}
+</style>

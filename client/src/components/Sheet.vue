@@ -7,11 +7,13 @@
         <th></th>
       </tr>
       <tr>
-        <th class="center">Wind</th>
-        <th class="center">Winner</th>
-        <th class="center">Picked on</th>
-        <th class="center">Points</th>
-        <th v-for="player in players" :key="player.id">{{ player.name }}</th>
+        <th class="uk-text-center">Wind</th>
+        <th class="uk-text-center">Winner</th>
+        <th class="uk-text-center">Picked on</th>
+        <th class="uk-text-center">Points</th>
+        <th v-for="player in players" :key="player.id">
+          <sheet-player-chooser v-model="player[0]"></sheet-player-chooser>
+        </th>
       </tr>
     </thead>
     <!-- Rows -->
@@ -20,12 +22,12 @@
     </sheet-row>
     <!-- Totals -->
     <tr>
-      <th colspan="4" class="right">Totals</th>
+      <th colspan="4" class="uk-text-right">Totals</th>
       <td v-for="player in players" :key="player.id">{{ totals[player.id] }}</td>
     </tr>
     <!-- Table Points -->
     <tr>
-      <th colspan="4" class="right">Table points</th>
+      <th colspan="4" class="uk-text-right">Table points</th>
       <td v-for="player in players" :key="player.id">{{ tablePoints[player.id] }}</td>
     </tr>
 
@@ -34,6 +36,7 @@
 
 <script>
 import SheetRow from '@/components/SheetRow';
+import SheetPlayerChooser from '@/components/SheetPlayerChooser';
 import '../assets/east.png';
 import '../assets/west.png';
 import '../assets/north.png';
@@ -57,7 +60,7 @@ export default {
   name: 'Sheet',
   data() {
     return {
-      players: [{ id: 1, name: 'toto' }, { id: 2, name: 'tata' }, { id: 3, name: 'titi' }, { id: 4, name: 'tutu' }],
+      players: [[{ id: undefined }], [{ id: 2, name: 'tata' }], [{ id: 3, name: 'titi' }], [{ id: 4, name: 'tutu' }]],
       rows: initRows(),
       tablePointsArray: [0, 1, 2, 4],
     };
@@ -113,16 +116,11 @@ export default {
   components: {
     // <my-component> ne sera disponible que dans le template parent
     'sheet-row': SheetRow,
+    'sheet-player-chooser': SheetPlayerChooser,
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.right {
-  text-align: right;
-}
-.center {
-  text-align: center;
-}
 </style>
