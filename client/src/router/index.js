@@ -1,16 +1,11 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Sheet from '@/components/Sheet';
+import Sheet from '@/components/sheet';
 
 Vue.use(Router);
 
 export default new Router({
   routes: [
-    {
-      path: '/',
-      name: 'Sheet',
-      component: Sheet,
-    },
     {
       path: '/sheet',
       name: 'Sheet',

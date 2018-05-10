@@ -5,22 +5,18 @@ const User = require('./userModel');
 
 const router = express.Router();
 
-const M = {};
-M.Player = Player;
-M.User = User;
-M.assign = function assign(destination, source) {
+const Model = {};
+Model.Player = Player;
+Model.User = User;
+Model.assign = function assign(destination, source) {
   const dest = destination;
   Object.keys(source).forEach((key) => {
     dest[key] = source[key];
   });
 };
-M.response = function response(err) {
-  const status = err ? 'ko' : 'ok';
-  return { status };
-};
 
 router.use((req, res, next) => {
-  res.M = M;
+  res.M = Model;
   next();
 });
 
@@ -29,7 +25,7 @@ const connect = function connect(callback) {
   const db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
   const $callback = callback || (() => {});
-  db.once('open', $callback);
+  return db;
 };
 
 module.exports = { router, connect };

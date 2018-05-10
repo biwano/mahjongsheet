@@ -6,6 +6,7 @@ import 'uikit/dist/css/uikit.min.css';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import App from './App';
+import Suggestion from './framework/components/suggestion';
 import router from './router';
 
 // loads the Icon plugin
@@ -13,6 +14,8 @@ UIkit.use(Icons);
 
 Vue.config.productionTip = false;
 Vue.use(Vuex);
+
+Vue.component('suggestion', Suggestion);
 
 /* eslint-disable no-new */
 new Vue({

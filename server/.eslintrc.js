@@ -18,5 +18,6 @@ module.exports = {
     'import/extensions': ['error', 'always', {
       js: 'never',
     }],
+    "no-underscore-dangle": 0,
   }
 }
