@@ -16,10 +16,11 @@
         </th>
       </tr>
     </thead>
-    <!-- Rows -->
-    <sheet-row v-for="row in rows" :key="row.index" v-if="row !== undefined" :visible="ready"
-      :players="players" :row="row" v-on:update:data="rowDataUpdated(row, $event)">
-    </sheet-row>
+    <!-- Rounds -->
+    <sheet-round v-for="round in rounds" :key="round.index" v-if="round !== undefined" :visible="ready"
+      :players="players" :data="round.data" v-on:update:data="roundDataUpdated(round, $event)"
+      :rules="rules">
+    </sheet-round>
     <!-- Totals -->
     <tbody v-if="ready">
       <tr>
@@ -37,100 +38,50 @@
 </template>
 
 <script>
-import SheetRow from '@/components/sheetRow';
+import SheetRound from '@/components/sheetRound';
 import SheetPlayerChooser from '@/components/sheetPlayerChooser';
-import '../assets/east.png';
-import '../assets/west.png';
-import '../assets/north.png';
-import '../assets/south.png';
+import mcrRules from '@/business/mcrRules';
+import '@/assets/east.png';
+import '@/assets/west.png';
+import '@/assets/north.png';
+import '@/assets/south.png';
 
 export default {
   name: 'Sheet',
   data() {
     return {
       // Players
-      players: [{ index: 0, value: { id: 1, name: 'toto' } },
-        { index: 1, value: { id: 2, name: 'tata' } },
-        { index: 2, value: { id: 3, name: 'titi' } },
-        { index: 3, value: { id: 4, name: 'tutu' } }],
+      players: [{ index: 0, value: { _id: 1, name: 'toto' } },
+        { index: 1, value: { _id: 2, name: 'tata' } },
+        { index: 2, value: { _id: 3, name: 'titi' } },
+        { index: 3, value: { _id: 4, name: 'tutu' } }],
       // Rounds
-      rows: [{ index: 0, data: { wind: 'E' } }],
+      rounds: [mcrRules.nextRound()],
       // Table point distribution
-      tablePointsArray: [0, 1, 2, 4],
-      winds: ['E', 'S', 'W', 'N'],
+      rules: mcrRules,
     };
   },
   created() {
   },
   methods: {
-    computeTotals() {
-      const totals = {};
-      for (let i = 0; i < this.players.length; i += 1) {
-        const player = this.players[i];
-        let total = 0;
-        let j = 0;
-        // Adding totals of all valid rounds
-        while (j < 16) {
-          const row = this.rows[j];
-          if (row.data.valid) total += row.data.points[player.index];
-          else break;
-          j += 1;
+    // A round is updated, a new round is created if this one is valid
+    roundDataUpdated(round_, $event) {
+      const round = round_;
+      round.data = $event;
+      if (round.next === undefined && this.rules.isValid(round.data)) {
+        round.next = this.rules.nextRound(round);
+        if (round.next !== undefined) {
+          this.rounds.push(round.next);
         }
-        totals[player.index] = total;
-      }
-      return totals;
-    },
-    createRow(previousRow) {
-      console.log(previousRow);
-      const index = previousRow.index + 1;
-      if (index >= 16) return undefined;
-      let windIndex = this.winds.indexOf(previousRow.data.wind);
-      if (index % 4 === 0) windIndex += 1;
-      const wind = this.winds[windIndex];
-      return { index, data: { wind }, previousRow };
-    },
-    rowDataUpdated(row_, $event) {
-      const row = row_;
-      row.data = $event;
-      if (row.next === undefined) {
-        row.next = this.createRow(row);
-        this.rows.push(row.next);
       }
     },
   },
   computed: {
     totals() {
-      return this.computeTotals();
+      return this.rules.totals(this.players, this.rounds);
     },
     tablePoints() {
-      const totalsArray = [];
-      const tablePoints = {};
-      // Sorting player totals in totals array
-      for (let i = 0; i < this.players.length; i += 1) {
-        const player = this.players[i];
-        totalsArray.push({ playerIndex: player.index, total: this.totals[player.index] });
-      }
-      totalsArray.sort((p1, p2) => p1.total - p2.total);
-      // Computing table points of the players
-      // i: current player
-      let i = 0;
-      while (i < this.players.length) {
-        let j = i;
-        // j: last player with the same total
-        while (j < this.players.length && totalsArray[j].total === totalsArray[i].total) {
-          j += 1;
-        }
-        // sharedpoints:  sum of points to be shared between players i to j
-        //                divided by numer of players
-        let sharedPoints = 0;
-        for (let k = i; k < j; k += 1) sharedPoints += this.tablePointsArray[k];
-        sharedPoints /= j - i;
-
-        // Attributing shared points to players i to j
-        for (let k = i; k < j; k += 1) tablePoints[totalsArray[k].playerIndex] = sharedPoints;
-        i = j;
-      }
-      return tablePoints;
+      return this.rules.tablePoints(this.players, this.rounds);
     },
     // sheet ready if all players are filled
     ready() {
@@ -140,9 +91,12 @@ export default {
       }
       return ready;
     },
+    finished() {
+      return this.rules.isFinished(this.rounds);
+    },
   },
   components: {
-    'sheet-row': SheetRow,
+    'sheet-round': SheetRound,
     'sheet-player-chooser': SheetPlayerChooser,
   },
 };
