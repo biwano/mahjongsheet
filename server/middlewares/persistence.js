@@ -1,12 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Player = require('./playerModel');
+const Game = require('./gameModel');
 const User = require('./userModel');
 
 const router = express.Router();
 
 const Model = {};
 Model.Player = Player;
+Model.Game = Game;
 Model.User = User;
 Model.assign = function assign(destination, source) {
   const dest = destination;
@@ -20,11 +22,10 @@ router.use((req, res, next) => {
   next();
 });
 
-const connect = function connect(callback) {
+const connect = function connect() {
   mongoose.connect('mongodb://localhost/test');
   const db = mongoose.connection;
   db.on('error', console.error.bind(console, 'connection error:'));
-  const $callback = callback || (() => {});
   return db;
 };
 
